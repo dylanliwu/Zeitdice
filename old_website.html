@@ -1,0 +1,888 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport" /><meta content="ie=edge" http-equiv="X-UA-Compatible" /><title>ZEITVision Portal</title><script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script><link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet" /></head><body class="layout-fluid"><script src="https://cdn.jsdelivr.net/npm/@mux/mux-player"></script><script src="https://cdn.jsdelivr.net/npm/thedatepicker@latest/dist/the-datepicker.min.js"></script><script src="https://unpkg.com/livekit-client"></script><link href="https://cdn.jsdelivr.net/npm/thedatepicker@latest/dist/the-datepicker.css" rel="stylesheet" /><style>#loader {
+  border: 16px solid #f3f3f3; /* Light grey */
+  border-top: 16px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+  position: fixed; /* Positioned relative to the viewport */
+  left: 50%; /* Center the loader horizontally */
+  top: 50%; /* Center the loader vertically */
+  transform: translate(-50%, -50%); /* Ensure center alignment */
+}
+
+@keyframes spin {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+  #result {
+    display: flex;
+    flex-direction: row; /* Arrange day containers horizontally */
+    overflow-x: auto; /* Enable horizontal scrolling for the result container */
+    gap: 20px; /* Add spacing between day containers */
+    white-space: nowrap; /* Ensure all day containers are on one line */
+    margin: 6px 0 0 0;
+  }
+
+  .day_container {
+    display: inline-block; /* Allow the container to grow with its content */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: #f9f9f9;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .day_container h3 {
+    margin: 0 0 10px 0; /* Add spacing below the date */
+    font-size: 1.2em;
+    text-align: left; /* Align the date to the left */
+  }
+
+  .image_grid {
+    display: flex;
+    flex-direction: row; /* Arrange images horizontally */
+    gap: 6px; /* Add spacing between images */
+    overflow-x: visible; /* Allow images to extend the width of the container */
+  }
+
+  .image_container {
+    display: flex;
+    width: 100px;
+    flex-direction: column; /* Stack image and time vertically */
+    align-items: center; /* Center align the content */
+    gap: 5px; /* Add space between the image and its time */
+  }
+
+  .image {
+     /* Fixed width for images */
+    height: auto; /* Maintain aspect ratio */
+    object-fit: cover; /* Ensure the image fits nicely without distortion */
+    border-radius: 5px; /* Optional: rounded corners */
+    border: 1px solid #ddd; /* Optional: subtle border for better visuals */
+  }
+
+  .image_container p {
+    margin: 0;
+    font-size: 0.9em;
+    color: #555;
+    text-align: center;
+  }
+
+  #still_container{
+    padding: 0px;
+  }
+
+  .image_container.selected {
+    border-bottom: 2px solid #007BFF; /* Bottom border line */
+    background-color: rgba(0, 123, 255, 0.1);
+  }
+
+  .card-body {
+    padding: 0;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  #calendarContainer {
+    padding: 0 0 0 16px;
+  }
+  #filterContainer {
+    padding: 0 0 0 16px;
+  }
+  video {
+    width: 100%;
+  }
+  #status {
+    color: #666;
+    margin: 10px 0;
+  }
+.detection-overlay {
+  pointer-events: none; /* Allow clicks to pass through to image */
+  z-index: 1;
+}
+
+.image-container {
+  position: relative;
+}
+
+.image {
+  width: 100%;
+  height: auto;
+}</style><div class="page"><aside class="navbar navbar-vertical navbar-expand-lg" data-bs-theme="dark"><div class="container-fluid"><button aria-controls="sidebar-menu" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#sidebar-menu" data-bs-toggle="collapse" type="button"><span class="navbar-toggler-icon"></span></button><div class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3"><a id="group-title">Group</a></div><div class="collapse navbar-collapse" id="sidebar-menu"><div class="hidden" id="calendarContainer"><div id="selecting_calendar"></div></div><ul class="navbar-nav pt-lg-3"><li class="nav-item dropdown show"><a aria-expanded="true" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button">All AIgents</a><div class="dropdown-menu show"><a class="dropdown-item" href="#"><span class="me-2">📦</span>Material Arrivals Alert</a><a class="dropdown-item" href="#"><span class="me-2">⚠️</span>Safety Issues</a><a class="dropdown-item" href="#"><span class="me-2">📊</span>Progress Report</a><a class="dropdown-item" href="#"><span class="me-2">🔧</span>Equipment Tracker</a><a class="dropdown-item" href="#"><span class="me-2">🌤️</span>Weather Impact</a><a class="dropdown-item" href="#"><span class="me-2">✅</span>Quality Inspector</a><a class="dropdown-item" href="#"><span class="me-2">📈</span>Resource Optimizer</a></div></li><li class="nav-item"><a class="nav-link" href="/aigents/new"><span class="nav-link-icon d-md-none d-lg-inline-block"><svg class="icon icon-tabler icon-tabler-plus" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none">)</path><path d="M12 5l0 14"></path><path d="M5 12l14 0"></path></svg></span><span class="nav-link-title">New AIgent</span></a></li></ul></div></div></aside><div class="page-wrapper"><div class="page-header d-print-none"><div class="container-xl"><div class="row g-2 align-items-center"><div class="col"><div id="source-select-container"><select class="form-select" id="source-select"></select></div></div><div class="col-auto ms-auto d-print-none"><div class="btn-list"><a class="btn btn-primary d-none d-sm-inline-block" id="images"><svg class="icon icon-tabler icon-tabler-photo" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"></path><path d="M4 7h16a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-10a1 1 0 0 1 1 -1z"># Main rectangle for a photo</path><path d="M9 13l2 -2l2 2l3 -3l3 3"># Illustration of overlapping photos</path><path d="M5 19h14"># Base for the gallery</path></svg>Images</a></div></div><div class="col-auto ms-auto d-print-none"><div class="btn-list"><a class="btn btn-primary d-none d-sm-inline-block" id="live_video"><svg class="icon icon-tabler icons-tabler-outline icon-tabler-video" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="https://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"></path><path d="M15 10l4.553 -2.276a1 1 0 0 1 1.447 .894v6.764a1 1 0 0 1 -1.447 .894l-4.553 -2.276v-4z"></path><path d="M3 6m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"></path></svg>Live Video</a></div></div><div class="col-auto ms-auto d-print-none"><div class="btn-list"><a class="btn btn-primary d-none d-sm-inline-block" id="assets">Videos</a></div></div><div class="col-auto ms-auto d-print-none"><div class="btn-list"><img alt="Logo" class="navbar-brand-image" height="32" id="group_logo" src="https://d33onyjek027b4.cloudfront.net/static_files/zeitdice_logo_transparent_black.png" width="110" /></div></div></div></div><div class="container hidden" id="stills_slider"><div class="horizontal-slider" style="overflow-x: auto; white-space: nowrap; padding: 2px; border-bottom: 1px solid #ddd; background-color: #f8f9fa;"><div id="result"></div></div></div></div><div class="page-body"><div class="container-xl"><div class="col-12 hidden" id="live_video_pane"><div id="video_status"></div><div class="row row-deck row-cards"><div class="col-lg-12"><div class="card"><div class="card-header"><h3 class="card-title" id="video-title">Live Stream</h3><div class="card-actions"><button class="btn btn-primary btn-sm" id="fullscreen-btn"><svg class="icon" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"></path><path d="M4 8v-2a2 2 0 0 1 2 -2h2"></path><path d="M4 16v2a2 2 0 0 0 2 2h2"></path><path d="M16 4h2a2 2 0 0 1 2 2v2"></path><path d="M16 20h2a2 2 0 0 0 2 -2v-2"></path></svg></button></div></div><div class="card-body p-0"><div class="position-relative" id="video-container"><video autoplay="" class="w-100" id="video-element" playsinline=""></video></div></div><div class="card-footer"><div class="row align-items-center"><div class="col"><div class="d-flex align-items-center"><div class="avatar bg-primary-lt me-2"><svg class="icon" height="24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"></path><path d="M15 10l4.553 -2.276a1 1 0 0 1 1.447 .894v6.764a1 1 0 0 1 -1.447 .894l-4.553 -2.276v-4z"></path><path d="M3 6m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"></path></svg></div><div><h3 class="mb-0" id="stream-status">Connected</h3><small class="text-muted" id="stream-details">Stream Information</small></div></div></div><div class="col-auto"><div class="btn-list"><button class="btn btn-outline-primary btn-sm" id="quality-btn">Quality: HD</button><button class="btn btn-outline-danger btn-sm" id="disconnect-btn">Disconnect</button></div></div></div></div></div></div></div></div><div class="col-lg-12 hidden" id="assets_pane"><div class="row row-deck row-cards" id="assets_results"></div></div><div class="col-lg-12 hidden" id="stills_pane"><div class="row"><div class="col-8"><div class="card"><div class="ribbon"><span id="still_title"></span></div><div class="card-body"><div id="still_container"><img id="selectedImage" /></div></div></div></div><div class="col-4"><div class="card"><div class="card-body p-2"><div class="accordion"><div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button" data-bs-target="#objectFilters" data-bs-toggle="collapse" type="button">Trackers</button></h2><div class="accordion-collapse show" id="objectFilters"><div class="accordion-body"><div id="object_list"></div><div class="mt-3"><button class="btn btn-sm btn-primary w-100" onclick="addObject()" type="button"><svg class="icon icon-tabler icon-tabler-plus me-1" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"></path><path d="M12 5l0 14"></path><path d="M5 12l14 0"></path></svg>Add Tracker</button></div></div></div></div><div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button" data-bs-target="#imageMetadata" data-bs-toggle="collapse" type="button">Metadata</button></h2><div class="accordion-collapse show" id="imageMetadata"><div class="accordion-body"><div id="selectedImageMetadata"></div></div></div></div></div></div></div></div></div></div><div class="col-lg-12 hidden" id="overview_pane"><div class="row row-deck row-cards" id="overview"></div></div></div></div><footer class="footer footer-transparent d-print-none"><div class="container-xl"><div class="row text-center align-items-center flex-row-reverse"><div class="col-lg-auto ms-lg-auto"><ul class="list-inline list-inline-dots mb-0"><li class="list-inline-item"><a class="link-secondary" href="https://www.zeitdice.com" rel="noopener" target="_blank">Documentation</a></li><li class="list-inline-item">Copyright &copy; 2025 <a class="link-secondary" href=".">ZEITDICE Inc</a>. All rights reserved.</li></ul></div></div></div></footer></div></div><script>const selectElement = document.getElementById('source-select');
+const pathSegments = window.location.pathname.split("/");
+const group = pathSegments[pathSegments.length - 1];
+console.log("group", group)
+
+// Calendar
+const date_pickercontainer = document.getElementById('selecting_calendar');
+const datepicker = new TheDatepicker.Datepicker(null, date_pickercontainer);
+
+const group_key = 0;
+const group_API_Endpoint = `/api/v4/groups/${group}?key=${group_key}&`;
+fetch(`${group_API_Endpoint}`)
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Something went wrong.');
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('Result:', data)
+    if (data.logo && data.logo.trim() !== "") {
+      document.getElementById('group_logo').src=data.logo; 
+    }
+    if (data.name && data.name.trim() !== "") {
+      //document.getElementById('page-title').textContent=title; 
+      document.getElementById('group-title').textContent=data.name;
+    }
+    if (data.sources && data.sources.length > 0) {
+        const sourceCount = data.sources.length;
+        console.log(`There are ${sourceCount} sources:`);
+        data.sources.forEach((source, index) => {
+            console.log(`Source ${index + 1}:`);
+            console.log(`Name: ${source.name}, GUID: ${source.guid}, Key: ${source.key}`);
+            const option = document.createElement('option');
+            option.value = JSON.stringify({ guid: source.guid, key: source.key }); // Store GUID and Key
+            option.textContent = source.name; // Display the name
+            selectElement.appendChild(option);
+            if (sourceCount > 1) {
+              add_source_to_overview(source);
+            }
+        });
+        if (sourceCount === 1) {
+           console.log(`Single Source, Loading it`);
+
+           load_source(data.sources[0]);
+           selectElement.disabled = true;
+        }else{
+          const option = document.createElement('option');
+          option.value = ""
+          option.textContent = "Overview - Please Select"; // Display the name
+          selectElement.prepend(option);
+          selectElement.value = "";
+        }
+    } else {
+        console.log("There are no sources.");
+    }
+  })
+  .catch(error => {
+    alert(error.message);
+  });
+
+// Add this after the group fetch
+const defaultSource = {
+  guid: 'd4a3584ea23ba3200cf3489f7f1f8ebd',
+  key: 'a2d7936edfe59c27a99e'
+};
+
+// Modify the selectElement event listener to include auto-loading
+selectElement.addEventListener('change', function () {
+  if (this.value) {
+    const source = JSON.parse(this.value);
+    console.log("Selected source, loading it GUID:", source.guid);
+    load_source(source);
+  } else {
+    console.log("No source selected");
+  }
+});
+
+// Auto-load the default source if no source is specified in URL
+window.addEventListener('load', function() {
+  const urlSource = readSourceFromUrl();
+  if (!urlSource) {
+    console.log("Loading default source");
+    //updateUrlWithSource(defaultSource);
+    load_source(defaultSource);
+  }
+});
+
+// Function to update the URL with source.guid and source.key
+function updateUrlWithSource(source) {
+  const params = new URLSearchParams(window.location.search);
+  params.set('guid', source.guid);
+  params.set('key', source.key);    
+  // Update the URL without refreshing the page
+  window.history.pushState({}, '', `${window.location.pathname}?${params.toString()}`);
+}
+
+// Function to read the URL parameters
+function readSourceFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const guid = params.get('guid');
+  const key = params.get('key'); 
+  if (guid && key) {
+    console.log(`GUID: ${guid}, Key: ${key}`);
+    // Use the GUID and Key as needed
+    return { guid, key };
+  } else {
+    console.log('No GUID or Key found in URL');
+    return null;
+  }
+}
+
+let isFirstLoad = true; // Flag to track if it's the first load
+
+datepicker.options.onSelect(function (event, date) {
+  if (isFirstLoad) {
+    // Skip the first load
+    isFirstLoad = false; // Reset the flag after the first load
+    return;
+  } 
+  date = datepicker.getSelectedDateFormatted("Y-m-d")
+  console.log('Selected date:', date);
+  const source = readSourceFromUrl();
+  if (!source) {
+    console.error('No source information available');
+    return;
+  }
+  query_api(date, source);
+});
+
+
+function load_source(source){
+  console.log(`Loading Source`, source);
+  document.getElementById('assets_pane').style.display = 'none';
+  document.getElementById('live_video_pane').style.display = 'none';
+  document.getElementById('stills_pane').style.display = 'block';
+  document.getElementById('stills_slider').style.display = 'block';
+  document.getElementById('overview_pane').style.display = 'none';
+  document.getElementById('calendarContainer').style.display = 'block';
+
+  if (source) {
+    if (source.key) {
+      fetch(`https://www.zeitdice.com/api/v4/sources/${source.guid}/stills/latest?key=${source.key}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch latest still');
+          }
+          return response.blob();
+        })
+        .then(blob => {
+          const imageUrl = URL.createObjectURL(blob);
+          const selectedImage = document.getElementById('selectedImage');
+          if (selectedImage) {
+            selectedImage.src = imageUrl;
+            // Clean up the object URL when we're done with it
+            selectedImage.onload = () => {
+              URL.revokeObjectURL(imageUrl);
+            };
+          } else {
+            console.warn('selectedImage element not found');
+          }
+        })
+        .catch(error => {
+          console.error('Error loading latest still:', error);
+          // Create a placeholder for the failed image
+          const stillContainer = document.getElementById('still_container');
+          if (stillContainer) {
+            stillContainer.innerHTML = `
+              <div class="alert alert-warning" role="alert">
+                <h4 class="alert-heading">Failed to load image</h4>
+                <p>${error.message}</p>
+              </div>
+            `;
+          }
+        });
+    }
+  }
+
+  const recent_stills_API_Endpoint = `/api/v4/sources/${source.guid}/stills/most_recent?key=${source.key}&`;
+  fetch(`${recent_stills_API_Endpoint}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Something went wrong.');
+      }
+      // Check content type
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        return response.json();
+      } else {
+        throw new Error('Invalid response format: Expected JSON but received ' + contentType);
+      }
+    })
+    .then(data => {
+      console.log('stills Result:', data);
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid data format: Expected an array');
+      }
+      document.getElementById('still_title').textContent = data[0].captured_at_local_tz;
+      show_stills(data);
+      const capturedAt = new Date(data[0].captured_at_local_tz);
+      // Set the initial date
+      const initialDate = capturedAt;
+      datepicker.options.setInitialDate(initialDate);
+      datepicker.render();
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert(error.message);
+    });
+}
+
+
+function query_api(date, source){
+  //const dateRangeStart = document.querySelector('.date_range_start').value;
+  //const dateRangeEnd = document.querySelector('.date_range_end').value;
+  const dateRangeStart = date;
+  const dateRangeEnd = date;
+
+  if (!dateRangeStart || !dateRangeEnd) {
+    alert('Start Date and/or End Date seem empty, please fix that');
+    return;
+  }
+
+
+  const zeitingsStillSearchAPI = `/api/v4/sources/${source.guid}/stills?key=${source.key}&`;
+  const sourcePath = `/sources/${source.guid}/stills`;
+
+  const timeRangeStart = "00:00"
+  const timeRangeEnd = "23:59"
+  const brightness = "0-100"
+  const wkndWkn = "true"
+  const timeRangePerDay = "0"
+
+  let searchFormData = `time_range_per_day=${timeRangePerDay}&date_range_start=${dateRangeStart}&date_range_end=${dateRangeEnd}&time_range_start=${timeRangeStart}&time_range_end=${timeRangeEnd}&brightness=${brightness}`;
+
+  if (wkndWkn == 1) {
+    searchFormData += "&wkn=true";
+  }
+
+  console.log("Form Submit", { dateRangeStart, dateRangeEnd, timeRangeStart, timeRangeEnd, brightness });
+  console.log("API Call", searchFormData);
+
+  fetch(`${zeitingsStillSearchAPI}${searchFormData}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Something went wrong. Did you set Start Date / End Date in the right format?');
+      }
+      return response.json();
+    })
+    .then(data => {
+      //document.querySelector('#counter').textContent = data.length;
+      console.log('Result:', data);
+      if (data.length > 1000) {
+        const confirmDialog = confirm(`You are trying to show ${data.length} photos. Are you sure? Under 1,000 works better.`);
+        if (confirmDialog) {
+          console.log('Sure');
+          //show_stills(data, sourcePath);
+          console.log("Photos?");
+        } else {
+          console.log('Cancelled');
+          //document.querySelector('#spinner').remove();
+        }
+      } else {
+        show_stills(data);
+      }
+    })
+    .catch(error => {
+      alert(error.message);
+    });
+};
+
+function show_stills(data) {
+  document.getElementById('result').innerHTML = '';
+  var resultDiv = document.getElementById('result');
+
+  // Group the data by date
+  var groupedData = {};
+  data.forEach(result => {
+    const date = result.captured_at_local_tz.split(' ')[0];
+    if (!groupedData[date]) {
+      groupedData[date] = {
+        images: []
+      };
+    }
+    groupedData[date].images.push(result);
+  });
+
+  Object.keys(groupedData).forEach(date => {
+    var dayContainer = document.createElement('div');
+    dayContainer.classList.add('day_container');
+
+    // Create header with date
+    var dateHeader = document.createElement('h3');
+    dateHeader.style.display = 'flex';
+    dateHeader.style.alignItems = 'center';
+    dateHeader.style.gap = '15px';
+    dateHeader.style.margin = '0 0 10px 0';
+
+    // Date text
+    var dateText = document.createElement('span');
+    dateText.textContent = date;
+    dateText.style.minWidth = 'fit-content';
+    dateHeader.appendChild(dateText);
+
+    dayContainer.appendChild(dateHeader);
+
+    // Create image grid
+    var imageGrid = document.createElement('div');
+    imageGrid.classList.add('image_grid');
+
+    // Add all images for this date
+    groupedData[date].images.forEach(result => {
+      var imgContainer = document.createElement('div');
+      imgContainer.classList.add('image_container');
+      imgContainer.style.position = 'relative';
+
+      var img = document.createElement('img');
+      img.classList.add('image');
+      img.src = result.image_url;
+
+      // Add click handler
+      imgContainer.addEventListener('click', () => {
+        document.getElementById('still_title').textContent = result.captured_at_local_tz;
+        document.querySelectorAll('.image_container').forEach(container => {
+          container.classList.remove('selected');
+        });
+        imgContainer.classList.add('selected');
+        updateImageWithIntel(result);
+      });
+
+      imgContainer.appendChild(img);
+
+      // Add time label
+      var timePara = document.createElement('p');
+      var datetime = result.captured_at_local_tz;
+      var time = datetime.substring(11).trim();
+      var parts = time.split(':');
+      var hour = parts[0].padStart(2, '0');
+      var minute = parts[1] || '00';
+      timePara.textContent = hour + ":" + minute;
+      imgContainer.appendChild(timePara);
+
+      imageGrid.appendChild(imgContainer);
+    });
+
+    dayContainer.appendChild(imageGrid);
+    resultDiv.appendChild(dayContainer);
+  });
+
+  // Auto-select first image
+  if (data.length > 0) {
+    const firstImageContainer = document.querySelector('.image_container');
+    if (firstImageContainer) {
+      firstImageContainer.click();
+    }
+  }
+}
+function updateImageWithIntel(imageData) {
+  try {
+    // Clear existing content
+    const meta = document.getElementById('selectedImageMetadata');
+    const container = document.getElementById('still_container');
+    meta.innerHTML = '';
+    container.innerHTML = '';
+
+    // Create and append the main image
+    const mainImage = new Image();
+    mainImage.src = imageData.image_url;
+    mainImage.crossOrigin = "anonymous";
+    container.appendChild(mainImage);
+
+    // Create an overlay canvas
+    const overlay = document.createElement('canvas');
+    overlay.style.position = 'absolute';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.pointerEvents = 'none';
+    container.appendChild(overlay);
+
+    // Get unique labels and generate colors
+    const uniqueLabels = [...new Set(imageData.intel?.detections?.map(d => d.label) || [])];
+    const colors = uniqueLabels.reduce((acc, label, index) => {
+      const hue = (360 / uniqueLabels.length) * index;
+      acc[label] = {
+        overlay: `hsla(${hue}, 70%, 50%, 0.3)`,
+        text: `hsl(${hue}, 70%, 50%)`
+      };
+      return acc;
+    }, {});
+
+    // Get unique labels and their counts from detections
+    const labelCounts = {};
+    const labelStates = {};  // Track checkbox states
+
+    if (imageData.intel?.detections) {
+      imageData.intel.detections.forEach(d => {
+        if (d.confidence > 0.1) {
+          labelCounts[d.label] = (labelCounts[d.label] || 0) + 1;
+          labelStates[d.label] = true;  // Default to visible
+        }
+      });
+    }
+
+    // Create interactive controls for each label
+    Object.entries(labelCounts).forEach(([label, count]) => {
+      const controlRow = document.createElement('div');
+      controlRow.className = 'detection-control';
+      controlRow.style.display = 'flex';
+      controlRow.style.alignItems = 'center';
+      controlRow.style.marginBottom = '8px';
+
+      // Checkbox for toggling visibility
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = labelStates[label];
+      checkbox.style.marginRight = '8px';
+
+      // Label name and count
+      const labelText = document.createElement('span');
+      labelText.textContent = `${label} (${count})`;
+      labelText.style.cursor = 'pointer';
+      labelText.style.color = colors[label].text;
+
+      // Add event listeners
+      checkbox.addEventListener('change', (e) => {
+        labelStates[label] = e.target.checked;
+        drawDetections(imageData, labelStates, overlay, mainImage, colors);
+      });
+
+      labelText.addEventListener('click', () => {
+        const originalState = labelStates[label];
+        labelStates[label] = true;
+        drawDetections(imageData, labelStates, overlay, mainImage, colors);
+        setTimeout(() => {
+          labelStates[label] = originalState;
+          drawDetections(imageData, labelStates, overlay, mainImage, colors);
+        }, 500);
+      });
+
+      controlRow.appendChild(checkbox);
+      controlRow.appendChild(labelText);
+      meta.appendChild(controlRow);
+    });
+
+    // Add basic metadata in small print
+    const jsonPre = document.createElement('pre');
+    jsonPre.style.margin = '10px 0';
+    jsonPre.style.padding = '10px';
+    jsonPre.style.borderRadius = '4px';
+    jsonPre.style.overflow = 'auto';
+    jsonPre.style.fontSize = '0.8em';
+
+    const simplifiedMetadata = {
+      captured_at: imageData.captured_at_local_tz,
+      image_size: imageData.intel?.image_size,
+      total_detections: imageData.intel?.detections?.length || 0
+    };
+
+    jsonPre.textContent = JSON.stringify(simplifiedMetadata, null, 2);
+    meta.appendChild(jsonPre);
+
+    // Wait for the image to load before drawing detections
+    mainImage.onload = () => {
+      overlay.width = mainImage.width;
+      overlay.height = mainImage.height;
+      drawDetections(imageData, labelStates, overlay, mainImage, colors);
+    };
+
+  } catch (err) {
+    console.warn('Error updating image with intel:', err);
+  }
+}
+
+function drawDetections(imageData, labelStates, overlay, mainImage, colors) {
+  const ctx = overlay.getContext('2d');
+  ctx.clearRect(0, 0, overlay.width, overlay.height);
+
+  if (!imageData.intel?.detections) return;
+
+  // Calculate scale factors
+  const scaleX = mainImage.width / imageData.intel.image_size.width;
+  const scaleY = mainImage.height / imageData.intel.image_size.height;
+
+  imageData.intel.detections.forEach(d => {
+    if (!labelStates[d.label]) return; // Skip if label is disabled
+
+    const polygon = d.polygon;
+    if (!polygon) return;
+
+    ctx.beginPath();
+    ctx.moveTo(polygon[0][0] * scaleX, polygon[0][1] * scaleY);
+
+    for(let i = 1; i < polygon.length; i++) {
+      ctx.lineTo(polygon[i][0] * scaleX, polygon[i][1] * scaleY);
+    }
+
+    ctx.closePath();
+    ctx.fillStyle = colors[d.label].overlay;
+    ctx.fill();
+  });
+}
+
+var assets_button = document.getElementById('assets');
+assets_button.addEventListener('click', function() {
+
+  // Later, read the values without a page refresh
+  const source = readSourceFromUrl();
+  if (!source) {
+    console.error('No source information available');
+    return;
+  }
+  document.getElementById('stills_pane').style.display = 'none';
+  document.getElementById('assets_pane').style.display = 'block';
+  document.getElementById('live_video_pane').style.display = 'none';
+  document.getElementById('stills_slider').style.display = 'none';
+  document.getElementById('overview_pane').style.display = 'none';
+  console.log("start assets" );
+
+  const recent_assets_API_Endpoint = `/api/v4/sources/${source.guid}/assets?key=${source.key}&`;
+  console.log("start assets", recent_assets_API_Endpoint );
+  fetch(`${recent_assets_API_Endpoint}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Something went wrong.');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Result:', data);
+      show_assets(data);
+
+    })
+    .catch(error => {
+      alert(error.message);
+    });
+});
+
+
+var live_video_button = document.getElementById('live_video');
+live_video_button.addEventListener('click', async function() {
+  document.getElementById('stills_pane').style.display = 'none';
+  document.getElementById('assets_pane').style.display = 'none';
+  document.getElementById('live_video_pane').style.display = 'block';
+  document.getElementById('stills_slider').style.display = 'none';
+
+  const livekitUrl = "wss://zeitvisionlive-egv7jize.livekit.cloud";
+  const roomName = "zeit-room-1";
+  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzkyMTU5MzksImlzcyI6IkFQSVl1WmFCS2R1bWFuRSIsIm5hbWUiOiJ2aWV3ZXIiLCJuYmYiOjE3MzkxOTQzMzksInN1YiI6InZpZXdlciIsInZpZGVvIjp7InJvb20iOiJ6ZWl0LXJvb20tMSIsInJvb21Kb2luIjp0cnVlfX0.NOVg7voFQ3xwjrTs-hsTe7xJNSZTeSIgk2TTooaGmRg";
+  const statusDiv = document.getElementById('video_status');
+  const room = new LivekitClient.Room({
+    // Add adaptive stream settings
+    adaptiveStream: true,
+    dynacast: true
+  });
+
+  async function connectToRoom() {
+    try {
+      await room.connect(livekitUrl, token);
+      statusDiv.textContent = 'Connected to camera. Waiting for video stream...';
+      console.log('Connected to camera:', roomName);
+      // Handle tracks being subscribed
+      room.on(LivekitClient.RoomEvent.TrackSubscribed, (track, publication, participant) => {
+        console.log('Track subscribed:', track.kind, 'from', participant.identity);
+        if (track.kind === 'video') {
+          const videoContainer = document.getElementById("live_video_pane");
+          // Clear any existing video elements
+          videoContainer.innerHTML = '';
+          // Attach the new video element
+          const videoElem = track.attach();
+          videoContainer.appendChild(videoElem);
+          statusDiv.textContent = 'Video stream connected!';
+        }
+      });
+
+      // Handle track unsubscribe
+      room.on(LivekitClient.RoomEvent.TrackUnsubscribed, (track, publication, participant) => {
+        console.log('Track unsubscribed:', track.kind, 'from', participant.identity);
+        track.detach();
+      });
+
+    } catch (error) {
+      console.error('Connection failed:', error);
+      statusDiv.textContent = 'Failed to connect: ' + error.message;
+    }
+  }
+
+  connectToRoom().catch(console.error);
+});
+
+var images_button = document.getElementById('images');
+images_button.addEventListener('click', function() {
+  document.getElementById('stills_pane').style.display = 'block';
+  document.getElementById('assets_pane').style.display = 'none';
+  document.getElementById('live_video_pane').style.display = 'none';
+  document.getElementById('stills_slider').style.display = 'block';
+  console.log("start images");
+
+});
+
+function show_assets(data) {
+  console.log("show assets called");
+  document.getElementById('assets_results').innerHTML = '';
+  var resultDiv = document.getElementById('assets_results');
+
+  data.forEach((result, index) => {
+    // Create card element
+    const colcard = document.createElement('div');
+    colcard.className = 'col-sm-6 col-lg-4';
+
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    // Card header with title
+    const cardHeader = document.createElement('div');
+    cardHeader.className = 'card-header';
+
+    const cardTitle = document.createElement('h3');
+    cardTitle.className = 'card-title';
+    cardTitle.textContent = result.name || 'Untitled Video';
+
+    cardHeader.appendChild(cardTitle);
+
+    // Card body with video preview
+    const cardBody = document.createElement('div');
+    cardBody.className = 'card-body p-0';
+
+    const videoContainer = document.createElement('div');
+    videoContainer.className = 'position-relative';
+
+    // Create video player using Mux Player
+    const muxPlayer = document.createElement('mux-player');
+    muxPlayer.setAttribute('playback-id', result.playback_id || '');
+    muxPlayer.setAttribute('metadata-video-title', result.name || '');
+    muxPlayer.setAttribute('stream-type', 'on-demand');
+    muxPlayer.setAttribute('prefer-mse', 'true');
+    muxPlayer.style.width = '100%';
+    muxPlayer.style.height = 'auto';
+    muxPlayer.style.aspectRatio = '16/9';
+
+    videoContainer.appendChild(muxPlayer);
+    cardBody.appendChild(videoContainer);
+
+    // Card footer with metadata
+    const cardFooter = document.createElement('div');
+    cardFooter.className = 'card-footer';
+
+    const metadataRow = document.createElement('div');
+    metadataRow.className = 'row align-items-center';
+
+    const metadataCol = document.createElement('div');
+    metadataCol.className = 'col';
+
+    // Format creation date
+    const createdAt = new Date(result.created_at);
+    const formattedDate = createdAt.toLocaleDateString();
+    const formattedTime = createdAt.toLocaleTimeString();
+
+    const metadata = document.createElement('div');
+    metadata.innerHTML = `
+      <div class="d-flex align-items-center">
+        <div class="avatar bg-primary-lt me-2">
+          <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M15 10l4.553 -2.276a1 1 0 0 1 1.447 .894v6.764a1 1 0 0 1 -1.447 .894l-4.553 -2.276v-4z"/>
+            <path d="M3 6m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="mb-0">${formattedDate}</h3>
+          <small class="text-muted">Created at ${formattedTime}</small>
+        </div>
+      </div>
+    `;
+
+    // Add download button
+    const actionCol = document.createElement('div');
+    actionCol.className = 'col-auto';
+
+    const btnList = document.createElement('div');
+    btnList.className = 'btn-list';
+
+    const downloadBtn = document.createElement('a');
+    downloadBtn.className = 'btn btn-primary btn-sm';
+    downloadBtn.href = result.video_file_url.startsWith('//') ? 
+      `https:${result.video_file_url}` : result.video_file_url;
+    downloadBtn.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-download" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+        <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
+        <path d="M7 11l5 5l5 -5" />
+        <path d="M12 4l0 12" />
+      </svg>
+      Download
+    `;
+
+    btnList.appendChild(downloadBtn);
+    actionCol.appendChild(btnList);
+
+    // Assemble all elements
+    metadataCol.appendChild(metadata);
+    metadataRow.appendChild(metadataCol);
+    metadataRow.appendChild(actionCol);
+    cardFooter.appendChild(metadataRow);
+
+    // Assemble final card
+    card.appendChild(cardHeader);
+    card.appendChild(cardBody);
+    card.appendChild(cardFooter);
+    colcard.appendChild(card);
+
+    // Add to results container
+    resultDiv.appendChild(colcard);
+  });
+}
+
+
+function add_source_to_overview(source){
+  document.getElementById('overview_pane').style.display = 'block';
+  console.log("show overview");
+  var resultDiv = document.getElementById('overview');
+  const colcard = document.createElement('div');
+  colcard.className = 'col-md-6 col-lg-3';
+
+
+
+  console.log('source adding to overview:', source);
+  const card = document.createElement('div');
+  card.className = 'card';
+
+  // Create card body
+  const cardBody = document.createElement('div');
+  cardBody.className = 'card-body';
+
+  // Header with name
+  const headerSection = document.createElement('div');
+  headerSection.className = 'd-flex align-items-center';
+  headerSection.textContent = source.name || 'No Project name';
+  const subheader = document.createElement('div');
+  subheader.className = 'subheader';
+  //subheader.textContent = result.name || 'No Name Available';
+
+  const msAuto = document.createElement('div');
+  msAuto.className = 'ms-auto lh-1';
+
+  headerSection.appendChild(subheader);
+  headerSection.appendChild(msAuto);
+
+  // Source preview section
+  const previewImage = document.createElement('img');
+  previewImage.src = `https://www.zeitdice.com/api/v4/sources/${source.guid}/stills/latest?key=${source.key}`;
+  previewImage.alt = 'Preview Image';
+  previewImage.className = 'img-fluid mb-3';
+
+  // Video link
+  //const videoLink = document.createElement('a');
+  //videoLink.href = result.video_file_url.startsWith('//') ? `https:${result.video_file_url}` : result.video_file_url;
+  //videoLink.textContent = result.name || 'No Name Available';
+
+
+  // Append all elements to the card
+  cardBody.appendChild(headerSection);
+  cardBody.appendChild(previewImage);
+  //subheader.appendChild(videoLink);
+  card.appendChild(cardBody);
+  colcard.appendChild(card);
+
+  // Append card to container
+  resultDiv.appendChild(colcard);
+
+}</script></body></html>

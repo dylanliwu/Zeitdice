@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Document</title>
+
+    <!-- Google Font Import -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Font Awesome Import (Icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+</head>
+<body>
+
+    <div class="header-container">
+        <div class="logo-container">
+            <img src="public/zeitdice-logo.png" class="logo" alt="Zeitdice Logo">
+        </div>
+        <div class="nav-bar">
+            <button class="nav-button"><i class="fa-solid fa-video"></i></button>
+            <button class="nav-button"><i class="fa-solid fa-photo-film"></i></button>
+            <button class="nav-button"><i class="fa-solid fa-image"></i></button>
+        </div>
+        <div class="nav-bar">
+            <button class="nav-button"><i class="fa-solid fa-bell"></i></button>
+            <button class="nav-button"><i class="fa-solid fa-user"></i></button>
+        </div>
+    </div>
+
+    <div class="main-content-container">
+        <img src="public/random-image.jpg" class="main-image">
+        <div class="image-navigator-container">
+            <div class="calendar">
+                <div class="calendar-header">
+                    <div id="prev" class="calendar-button"><i class="fa-solid fa-angle-left"></i></div>
+                    <div class="calendar-title" id="calendarTitle"></div>
+                    <div id="next" class="calendar-button"><i class="fa-solid fa-angle-right"></i></div>
+                </div>
+                <div class="weekdays">
+                    <div>Sun</div>
+                    <div>Mon</div>
+                    <div>Tue</div>
+                    <div>Wed</div>
+                    <div>Thu</div>
+                    <div>Fri</div>
+                    <div>Sat</div>
+                </div>
+                <div class="days" id="days"></div>
+            </div>
+            <div class="image-by-date-container">
+                <img src="public/random-image.jpg" class="image-by-date"></img>
+                <img src="public/random-image.jpg" class="image-by-date"></img>
+                <img src="public/random-image.jpg" class="image-by-date"></img>
+                <img src="public/random-image.jpg" class="image-by-date"></img>
+            </div>
+        </div>
+
+    </div>
+    
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+
+</body>
+</html>
