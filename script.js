@@ -1,3 +1,21 @@
+const mainContent = document.getElementById("mainContent");
+const profileButton = document.getElementById("profileButton");
+const profileContent = document.getElementById("profileContent");
+
+profileContent.style.display = "none";
+
+profileButton.addEventListener("click", () => {
+    mainContent.style.display = "none";
+    profileContent.style.display = "block";
+});
+
+imageButton = document.getElementById("imageButton");
+
+imageButton.addEventListener("click", () => {
+    mainContent.style.display = "flex";
+    profileContent.style.display = "none";
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     const calendarTitle = document.getElementById("calendarTitle");
     const daysContainer = document.getElementById("days");
@@ -29,6 +47,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             daysContainer.appendChild(dayDiv);
         }
+        function formatDate(day, month, year) {
+            const dd = day.toString().padStart(2, "0");
+            const mm = (month + 1).toString().padStart(2, "0"); // month is zero-based
+            return dd + "-" + mm + "-" + year;
+        }
+        
+        // Inside your renderCalendar() function's loop for current month days:
         for (let i = 0; i < lastDay; i++){
             const day = i + 1;
             const dayDiv = document.createElement("div");
@@ -37,17 +62,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 dayDiv.classList.add("today");
             }
             dayDiv.addEventListener('click', function() {
+                // If the clicked day is today, log complete date and exit
                 if (this.classList.contains("today")) {
                     if (selectedDayDiv && selectedDayDiv !== this) {
                         selectedDayDiv.classList.remove("highlight");
                     }
                     this.classList.remove("dim");
                     selectedDayDiv = null;
+                    console.log("Current day clicked: " + formatDate(day, month, year));
                     return;
                 }
+                // Remove highlight from a previously selected day, if any
                 if (selectedDayDiv && selectedDayDiv !== this) {
                     selectedDayDiv.classList.remove("highlight");
                 }
+                // Toggle highlight and log complete date if a new day is highlighted.
                 if (this.classList.contains("highlight")) {
                     this.classList.remove("highlight");
                     let todayDiv = document.querySelector(".days .today");
@@ -58,23 +87,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     let todayDiv = document.querySelector(".days .today");
                     if (todayDiv) todayDiv.classList.add("dim");
                     selectedDayDiv = this;
+                    console.log("Highlighted Day: " + formatDate(day, month, year));
                 }
             });
             daysContainer.appendChild(dayDiv);
         }
-        const nextMonthStartDay = 7 - new Date(year, month + 1, 0).getDay() - 1;
-        for (let i = 1; i <= nextMonthStartDay; i++){
-            const dayDiv = document.createElement("div");
-            dayDiv.textContent = i;
-            dayDiv.classList.add("fade");
-            dayDiv.addEventListener('click', function() {
-                currentDate.setMonth(currentDate.getMonth() + 1);
-                renderCalendar(currentDate);
-            });
-            daysContainer.appendChild(dayDiv);
-        }
     }
-
     prevButton.addEventListener("click", () => {
         currentDate.setMonth(currentDate.getMonth() - 1);
         renderCalendar(currentDate);
@@ -87,3 +105,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderCalendar(currentDate);
 });
+
+const datedImage = document.querySelectorAll('.dated-image');
+
+datedImage.forEach(image =>
+    image.addEventListener('click', () => document.querySelector('.main-feed').src = image.src)
+);
+
